@@ -2,6 +2,7 @@ import { FC, useEffect, useMemo, useState } from "react";
 import { CartItem, Product, ProduceWithAmount } from "../types";
 import { API_URL } from "../consts";
 import { toast } from "react-toastify";
+import useCartProducts from "../hooks/useCartProducts";
 
 type Props = {
     products: Array<Product>;
@@ -41,18 +42,7 @@ const Cart: FC<Props> = ({
             });
     }, [cartItems, setCartItems]);
 
-    const cartItemMap = useMemo(
-        () => new Map(cartItems.map((item) => [item.pid, item])),
-        [cartItems]
-    );
-
-    const cartItemProducts = useMemo<Array<ProduceWithAmount>>(() => {
-        const filteredProducts = products.filter((p) => cartItemMap.has(p.id));
-        return filteredProducts.map((p) => ({
-            ...p,
-            amount: cartItemMap.get(p.id)?.amount || 0,
-        }));
-    }, [products, cartItemMap]);
+    const cartProducts = useCartProducts(products, cartItems);
 
     return (
         <div className="cart-wrapper">
@@ -63,7 +53,7 @@ const Cart: FC<Props> = ({
                     <>
                         <h3>Cart total: $ {total}</h3>
                         <ul className="cart-item-list">
-                            {cartItemProducts.map((item) => (
+                            {cartProducts.map((item) => (
                                 <li key={item.id}>
                                     <img src={item.url} alt="" />
                                     <p>

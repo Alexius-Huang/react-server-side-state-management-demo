@@ -31,23 +31,18 @@ export default function useCart() {
         );
         if (cartItemIndex === -1) return;
 
-        setCartItems((cartItems) => {
-            const newCartItems = [...cartItems];
-
-            if (newCartItems[cartItemIndex].amount === 1) {
-                newCartItems.splice(cartItemIndex, 1);
-            } else {
-                const newCartItems = [...cartItems];
-                const item = cartItems[cartItemIndex];
-                newCartItems[cartItemIndex] = {
-                    ...item,
-                    amount: item.amount - 1,
-                };
-                setCartItems(newCartItems);
-            }
-
-            return newCartItems;
-        });
+        const newCartItems = [...cartItems];
+        if (newCartItems[cartItemIndex].amount === 1) {
+            newCartItems.splice(cartItemIndex, 1);
+            setCartItems(newCartItems);
+        } else {
+            const item = cartItems[cartItemIndex];
+            newCartItems[cartItemIndex] = {
+                ...item,
+                amount: item.amount - 1,
+            };
+            setCartItems(newCartItems);
+        }
     };
 
     return {

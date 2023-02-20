@@ -1,9 +1,8 @@
-import { FC, useMemo } from "react";
-import { CartItem, Product, ProduceWithAmount } from "../types";
+import { FC } from "react";
+import { CartItem, Product } from "../types";
 import { toast } from "react-toastify";
 import useCartCalculation from "../swr-hooks/useCartCalculation";
-import useProducts from "../swr-hooks/useProducts";
-// import useCartItemProducts from "../swr-hooks/useCartItemProducts";
+import useCartProducts from "../swr-hooks/useCartProductsSWR";
 
 type Props = {
     cartItems: Array<CartItem>;
@@ -13,7 +12,6 @@ type Props = {
 };
 
 const CartSWR: FC<Props> = ({ cartItems, addToCart, removeFromCart }) => {
-    const { data: products = [] } = useProducts();
     const {
         isValidating: isCalculating,
         data: { cartTotalPrice: total } = { cartTotalPrice: 0 },
@@ -23,20 +21,7 @@ const CartSWR: FC<Props> = ({ cartItems, addToCart, removeFromCart }) => {
         },
     });
 
-    const cartItemMap = useMemo(
-        () => new Map(cartItems.map((item) => [item.pid, item])),
-        [cartItems]
-    );
-
-    const cartItemProducts = useMemo<Array<ProduceWithAmount>>(() => {
-        const filteredProducts = products.filter((p) => cartItemMap.has(p.id));
-        return filteredProducts.map((p) => ({
-            ...p,
-            amount: cartItemMap.get(p.id)?.amount || 0,
-        }));
-    }, [products, cartItemMap]);
-
-    // const cartItemProducts = useCartItemProducts(cartItems);
+    const cartProducts = useCartProducts(cartItems);
 
     return (
         <div className="cart-wrapper">
@@ -50,7 +35,7 @@ const CartSWR: FC<Props> = ({ cartItems, addToCart, removeFromCart }) => {
                             {isCalculating ? "Calculating..." : `$ ${total}`}
                         </h3>
                         <ul className="cart-item-list">
-                            {cartItemProducts.map((item) => (
+                            {cartProducts.map((item) => (
                                 <li key={item.id}>
                                     <img src={item.url} alt="" />
                                     <p>
