@@ -9,7 +9,14 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 function App() {
-    const { cartItems, setCartItems, addToCart, removeFromCart } = useCart();
+    const {
+        cartItems,
+        setCartItems,
+        addToCart,
+        removeFromCart,
+        hasRolledback,
+        rollbackCart
+    } = useCart();
     const [isLoaded, setIsLoaded] = useState(false);
     const [products, setProducts] = useState<Array<Product>>([]);
 
@@ -40,6 +47,8 @@ function App() {
                 removeFromCart={removeFromCart}
                 cartItems={cartItems}
                 setCartItems={setCartItems}
+                rollbackCart={rollbackCart}
+                hasRolledBack={hasRolledback}
             />
 
             <ToastContainer />

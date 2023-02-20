@@ -9,16 +9,29 @@ type Props = {
     setCartItems: (cartItems: Array<CartItem>) => void;
     addToCart(product: Product): void;
     removeFromCart(product: Product): void;
+    rollbackCart(): void;
+    hasRolledBack: boolean;
 };
 
-const CartSWR: FC<Props> = ({ cartItems, addToCart, removeFromCart }) => {
+const CartSWR: FC<Props> = ({
+    cartItems,
+    addToCart,
+    removeFromCart,
+    hasRolledBack,
+    rollbackCart
+}) => {
     const {
         isValidating: isCalculating,
-        data: { cartTotalPrice: total } = { cartTotalPrice: 0 },
-    } = useCartCalculation(cartItems, {
+        data: { cartTotalPrice: total } = { cartTotalPrice: 0 }
+    } = useCartCalculation(cartItems, hasRolledBack, {
+        keepPreviousData: true,
         onSuccess() {
             toast("Cart Calculation Complete!");
         },
+        onError() {
+            rollbackCart();
+            toast("Cart Calculation Failed!");
+        }
     });
 
     const cartProducts = useCartProducts(cartItems);
@@ -32,7 +45,10 @@ const CartSWR: FC<Props> = ({ cartItems, addToCart, removeFromCart }) => {
                     <>
                         <h3>
                             Cart total:{" "}
-                            {isCalculating ? "Calculating..." : `$ ${total}`}
+                            {isCalculating
+                                ? "Calculating..."
+                                : `$ ${total}`
+                            }
                         </h3>
                         <ul className="cart-item-list">
                             {cartProducts.map((item) => (

@@ -15,10 +15,11 @@ const fetcher = ([url, cartItems]: Arguments) =>
 
 export default function useCartCalculation(
     cartItems: Array<CartItem>,
-    options: SWRHookOptions = {}
+    hasRolledback: boolean,
+    options: SWRHookOptions
 ) {
     const queryKeys =
-        cartItems.length === 0
+        cartItems.length === 0 || hasRolledback
             ? null
             : [`${API_URL}/cart-calculation`, cartItems];
 

@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { CartItem, Product } from "../types";
 
 export default function useCart() {
     const [cartItems, setCartItems] = useState<Array<CartItem>>([]);
+    const [hasRolledback, setHasRolledback] = useState(false);
+    const previousCartItemsRef = useRef<Array<CartItem>>([]);
 
     const addToCart = (product: Product) => {
+        previousCartItemsRef.current = cartItems;
+        setHasRolledback(false);
+
         const cartItemIndex = cartItems.findIndex(
             (item) => item.pid === product.id
         );
@@ -26,6 +31,9 @@ export default function useCart() {
     };
 
     const removeFromCart = (product: Product) => {
+        previousCartItemsRef.current = cartItems;
+        setHasRolledback(false);
+
         const cartItemIndex = cartItems.findIndex(
             (item) => item.pid === product.id
         );
@@ -45,10 +53,17 @@ export default function useCart() {
         }
     };
 
+    const rollbackCart = () => {
+        setHasRolledback(true);
+        setCartItems(previousCartItemsRef.current);
+    };
+
     return {
         cartItems,
         setCartItems,
         addToCart,
         removeFromCart,
+        hasRolledback,
+        rollbackCart
     };
 }

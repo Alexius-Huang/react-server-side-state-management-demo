@@ -6,7 +6,14 @@ import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 
 function AppWithSWR() {
-    const { cartItems, setCartItems, addToCart, removeFromCart } = useCart();
+    const {
+        cartItems,
+        setCartItems,
+        addToCart,
+        removeFromCart,
+        rollbackCart,
+        hasRolledback
+    } = useCart();
 
     return (
         <div className="App">
@@ -19,6 +26,8 @@ function AppWithSWR() {
                 removeFromCart={removeFromCart}
                 cartItems={cartItems}
                 setCartItems={setCartItems}
+                rollbackCart={rollbackCart}
+                hasRolledBack={hasRolledback}
             />
 
             <ToastContainer />

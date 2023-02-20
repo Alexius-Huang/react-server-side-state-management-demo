@@ -1,5 +1,5 @@
-import { FC, useEffect, useMemo, useState } from "react";
-import { CartItem, Product, ProduceWithAmount } from "../types";
+import { FC, useEffect, useState } from "react";
+import { CartItem, Product } from "../types";
 import { API_URL } from "../consts";
 import { toast } from "react-toastify";
 import useCartProducts from "../hooks/useCartProducts";
@@ -10,6 +10,8 @@ type Props = {
     setCartItems: (cartItems: Array<CartItem>) => void;
     addToCart(product: Product): void;
     removeFromCart(product: Product): void;
+    rollbackCart(): void;
+    hasRolledBack: boolean;
 };
 
 const Cart: FC<Props> = ({
@@ -18,12 +20,14 @@ const Cart: FC<Props> = ({
     setCartItems,
     addToCart,
     removeFromCart,
+    hasRolledBack,
+    rollbackCart
 }) => {
     const [total, setTotal] = useState(0);
 
     /* Cart Calculation API */
     useEffect(() => {
-        if (cartItems.length === 0) return;
+        if (cartItems.length === 0 || hasRolledBack) return;
 
         fetch(`${API_URL}/cart-calculation`, {
             method: "POST",
@@ -38,9 +42,10 @@ const Cart: FC<Props> = ({
                 toast("Cart Calculation Complete", { type: "success" });
             })
             .catch(() => {
+                rollbackCart();
                 toast("Cart Calculation Failed", { type: "error" });
             });
-    }, [cartItems, setCartItems]);
+    }, [cartItems, setCartItems, rollbackCart, hasRolledBack]);
 
     const cartProducts = useCartProducts(products, cartItems);
 
