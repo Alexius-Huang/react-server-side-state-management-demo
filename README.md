@@ -11,7 +11,7 @@ This project's main purpose is to demonstrate how to perform state management in
 1. Clone the project:
 
 ```bash
-git clone TBD
+git clone git@github.com:Alexius-Huang/react-server-side-state-management-demo.git
 ```
 
 2. Please use the latest stable version of Node, if you have node version manager:
