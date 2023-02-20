@@ -5,11 +5,11 @@ const cors = require("cors");
 const app = express();
 const port = 8080;
 
-const productFilePath = path.join(__dirname, "products.json");
-
-const favoriteProducts = new Set([3, 5]);
+const productFilePath = path.join(__dirname, 'data', 'products.json');
+const favoriteProductsFilePath = path.join(__dirname, 'data', 'favorite-products.json');
 
 const getProducts = () => JSON.parse(fs.readFileSync(productFilePath, "utf8"));
+const getFavoriteProductIds = () => JSON.parse(fs.readFileSync(favoriteProductsFilePath, 'utf8'));
 
 app.use(cors());
 app.use(express.json());
@@ -35,11 +35,12 @@ app.post("/cart-calculation", (req, res) => {
 });
 
 app.get("/favorite-products", (req, res) => {
-    res.status(200).json(Array.from(favoriteProducts));
+    res.status(200).json(getFavoriteProductIds());
 });
 
 app.post("/favorite-products", (req, res) => {
     const { productId: pid } = req.body;
+    const favoriteProducts = new Set(getFavoriteProductIds());
 
     if (favoriteProducts.has(pid)) {
         favoriteProducts.delete(pid);
@@ -47,7 +48,11 @@ app.post("/favorite-products", (req, res) => {
         favoriteProducts.add(pid);
     }
 
-    res.status(200).json(Array.from(favoriteProducts));
+    const result = Array.from(favoriteProducts);
+
+    fs.writeFileSync(favoriteProductsFilePath, JSON.stringify(result));
+
+    res.status(200).json(result);
 });
 
 app.listen(port, () => {
